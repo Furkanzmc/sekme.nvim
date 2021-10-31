@@ -1,0 +1,110 @@
+*sekme_nvim.txt*  sekme.nvim
+
+Author:  Furkan Uzumcu
+
+INTRODUCTION                                                        *sekme.nvim*
+
+`sekme.nvim` is a chain-completion plugin that complements Neovim's own
+completion functions. (See |ins-completion|)
+
+I initially copied this chained completion idea from completion-nvim
+(https://github.com/nvim-lua/completion-nvim).
+
+`sekme.nvim` uses a list of |ins-completion| keys to rotate the completion
+source. If one source doesn't provide any completion items, it switches to the
+next one until a completion is found. It also leverages |completefunc|, but
+it's just a source in the chain instead of a new one.
+
+OPTIONS                                                          *sekme-options*
+================================================================================
+
+These options are only enabled if |options.nvim| is installed.
+See https://github.com/Furkanzmc/options.nvim for installation details.
+
+Global ~
+
+completion_timeout                            *sekme-options-completion_timeout*
+
+Defaults to 150. Determines how much time `sekme.nvim` waits before it tries
+another source. You may want to reduce this timeout to a lower value for
+filetypes that you don't have a language server for.
+
+You can also use `b:sekme_completion_timeout` to customize this value.
+
+completion_key                                    *sekme-options-completion_key*
+
+Defaults to <Tab>.
+
+You can also use `g:sekme_completion_key` to customize this value.
+
+completion_rkey                                  *sekme-options-completion_rkey*
+
+Defaults to <S-Tab>.
+
+You can also use `g:sekme_completion_rkey` to customize this value.
+
+abbvr_trigger_char                               *sekme-options-completion_rkey*
+
+Defaults to `@`.
+
+You can also use `g:sekme_abbvr_trigger_char` to customize this value.
+
+LUA                                                                  *sekme-lua*
+================================================================================
+
+setup({opts})                                                      *options.set*
+
+    Initialize the plugin. This will internally call
+    |options.setup_completion| for each buffer.
+
+    Parameters: ~
+        {opts} (optional, table)
+            - {completion_key} (optional, string): Defaults to <Tab>
+            - {completion_rkey} (optional, string): Defaults to <R-Tab>. Used
+              for reversing the completion order.
+            - {abbvr_trigger_char} (optional, string): Defaults to `@`. If you
+              are using a trigger key for your abbreviations, `sekme.nvim`
+              will trigger the abbreviation instead of completion functions.
+              This is useful for preventing collisions with actual words when
+              you are using abbreviations.
+            - {custom_sources} (optional)
+                Each item in {custom_sources} table needs to have these keys:
+
+                    - {complete} (function): A function to be called. The
+                      parameters are lines and word to complete.
+                    - {filetypes} (optional, string): When set, it's only
+                      called for the given filetypes.
+
+                These functions will be triggered when |completefunc| is the
+                current |ins-completion| source.
+
+                Example: >
+                    function complete_work_days(lines, base)
+                        -- lines is a list of lines in the current buffer. You
+                        -- don't have to use it.
+                        return {
+                            { word = "Monday", kind = "Days" },
+                            { word = "Tuesday", kind = "Days" },
+                            { word = "Wednesday", kind = "Days" },
+                            { word = "Thursday", kind = "Days" },
+                            { word = "Friday", kind = "Days" },
+                        }
+                    end
+
+                    require("sekme").setup({
+                        custom_sources = {
+                            {
+                                complete = complete_work_days,
+                                filetypes = { "markdown" },
+                            },
+                        },
+                    })
+
+ABOUT                                                            *sekme-about*
+================================================================================
+
+Grab the latest version or report a bug on GitHub:
+
+https://github.com/Furkanzmc/sekme.nvim
+
+vim:tw=80:colorcolumn=81:et:ft=help:norl:
