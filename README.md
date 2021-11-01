@@ -87,6 +87,7 @@ Use your favorite plugin manager to install.
 - [supertab.vim](https://github.com/ervandew/supertab)
 - [options.nvim](https://github.com/Furkanzmc/options.nvim)
 - [completion-nvim](https://github.com/nvim-lua/completion-nvim)
+- [vim-mucomplete](https://github.com/lifepillar/vim-mucomplete)
 
 # TODO
 
