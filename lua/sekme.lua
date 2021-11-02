@@ -292,8 +292,15 @@ end
 function M.setup_completion(bufnr)
     if vim.fn.exists("b:sekme_is_completion_configured") == 0 then
         api.nvim_buf_set_var(bufnr, "sekme_is_completion_configured", false)
-    elseif api.nvim_buf_get_var(bufnr, "sekme_is_completion_configured") == 1 then
+    elseif api.nvim_buf_get_var(bufnr, "sekme_is_completion_configured") == true then
         return
+    end
+
+    if not option_loaded then
+        local option_set, _ = pcall(api.nvim_buf_get_var, bufnr, "sekme_completion_timeout")
+        if not option_set then
+            api.nvim_buf_set_var(bufnr, "sekme_completion_timeout", 150)
+        end
     end
 
     vim.bo[bufnr].completefunc = "v:lua.trigger_sekme"
