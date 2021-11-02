@@ -326,6 +326,10 @@ function M.setup(opts)
     cmd([[autocmd BufEnter * lua require'sekme'.setup_completion(vim.api.nvim_get_current_buf())]])
     cmd([[augroup END]])
 
+    if opts == nil then
+        opts = {}
+    end
+
     opts.completion_key = opts.completion_key or "<Tab>"
     opts.completion_rkey = opts.completion_key or "<S-Tab>"
     opts.abbvr_trigger_char = opts.abbvr_trigger_char or "<S-Tab>"
@@ -339,6 +343,8 @@ function M.setup(opts)
     vim.g.sekme_completion_key = opts.completion_key
     vim.g.sekme_completion_rkey = opts.completion_key
     vim.g.sekme_abbvr_trigger_char = opts.abbvr_trigger_char
+
+    cmd([[call sekme#setup_keymap()]])
 end
 
 -- }}}
