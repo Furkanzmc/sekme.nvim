@@ -1,26 +1,40 @@
-function! s:is_previous_character_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
+let s:is_tab_map = v:false
+
+function! s:is_previous_character_space(col, line) abort
+    return !a:col || a:line[a:col - 1]  =~ '\s'
 endfunction
 
-function! s:is_previous_character_abbvr_char() abort
-    let col = col('.') - 1
-    return col && getline('.')[col - 1]  =~ g:sekme_abbvr_trigger_char
+function! s:is_previous_character_abbvr_char(col, line) abort
+    return a:col && a:line[a:col - 1]  =~ g:sekme_abbvr_trigger_char
 endfunction
 
-function sekme#completion_wrapper()
+function sekme#completion_wrapper(backward) abort
+    if pumvisible()
+        echoerr "Menu cannot be visible when you call this!"
+        return
+    endif
+
+    let l:col = col('.') - 1
+    let l:line = getline('.')
+    if !a:backward && s:is_previous_character_abbvr_char(l:col, l:line)
+        return "\<C-]>"
+    endif
+
+    if s:is_tab_map && s:is_previous_character_space(l:col, l:line)
+        if a:backward
+            return "\<S-TAB>"
+        else
+            return "\<TAB>"
+        endif
+    endif
+
     lua require'sekme'.trigger_completion()
     return ''
 endfunction
 
-function s:trigger_completion()
-    return "\<c-r>=sekme#completion_wrapper()\<CR>"
-endfunction
+function sekme#setup_keymap() abort
+    let s:is_tab_map = tolower(g:sekme_completion_key) == "<tab>"
 
-function sekme#setup_keymap()
-    execute 'imap <silent><expr> ' . g:sekme_completion_key .
-                \ ' pumvisible() ? "\<C-n>" : <SID>is_previous_character_abbvr_char() ? "\<C-]>" : <SID>is_previous_character_space() ? "\<TAB>" : <SID>trigger_completion()'
-
-    execute 'imap <silent><expr> ' . g:sekme_completion_rkey .
-                \ 'pumvisible() ? "\<C-p>" : <SID>is_previous_character_space() ? "\<S-TAB>" : <SID>trigger_completion()'
+    execute 'imap <nowait> ' . g:sekme_completion_key . ' <plug>(SekmeCompleteFwd)'
+    execute 'imap <nowait> ' . g:sekme_completion_rkey . ' <plug>(SekmeCompleteBack)'
 endfunction
