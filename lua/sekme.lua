@@ -338,8 +338,8 @@ function M.setup(opts)
     end
 
     opts.completion_key = opts.completion_key or "<Tab>"
-    opts.completion_rkey = opts.completion_key or "<S-Tab>"
-    opts.abbvr_trigger_char = opts.abbvr_trigger_char or "<S-Tab>"
+    opts.completion_rkey = opts.completion_rkey or "<S-Tab>"
+    opts.abbvr_trigger_char = opts.abbvr_trigger_char or "@"
 
     if opts ~= nil and opts.custom_sources ~= nil then
         for _, source in ipairs(opts.custom_sources) do
@@ -348,7 +348,7 @@ function M.setup(opts)
     end
 
     vim.g.sekme_completion_key = opts.completion_key
-    vim.g.sekme_completion_rkey = opts.completion_key
+    vim.g.sekme_completion_rkey = opts.completion_rkey
     vim.g.sekme_abbvr_trigger_char = opts.abbvr_trigger_char
 
     cmd([[call sekme#setup_keymap()]])
