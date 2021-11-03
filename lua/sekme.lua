@@ -52,39 +52,44 @@ local s_completion_timer = nil
 local s_vim_sources = {
     {
         keys = "<c-x><c-o>",
+        name = "omni",
         prediciate = function()
             return opt_local.omnifunc:get() ~= "" or opt.omnifunc:get() ~= ""
         end,
     },
     {
         keys = "<c-x><c-u>",
+        name = "user",
         prediciate = function()
             return opt_local.completefunc:get() ~= "" or opt.completefunc:get() ~= ""
         end,
     },
-    { keys = "<c-x><c-n>" },
-    { keys = "<c-n>" },
+    { keys = "<c-x><c-n>", name = "keywords" },
+    { keys = "<c-n>", name = "complete" },
     {
         keys = "<c-x><c-]>",
+        name = "tags",
         prediciate = function()
             return #fn.tagfiles() > 0
         end,
     },
-    { keys = "<c-x><c-v>", filetypes = { "vim" } },
-    { keys = "<c-x><c-f>" },
+    { keys = "<c-x><c-v>", filetypes = { "vim" }, name = "vim-commands" },
+    { keys = "<c-x><c-f>", name = "file" },
     {
         keys = "<c-x><c-k>",
+        name = "dictionary",
         prediciate = function()
             return #opt.dictionary:get() > 0 or #opt_local.dictionary:get() > 0
         end,
     },
     {
         keys = "<c-x><c-s>",
+        name = "spell",
         prediciate = function()
             return opt_local.spell:get()
         end,
     },
-    { keys = "<c-x><c-l>" },
+    { keys = "<c-x><c-l>", name = "lines" },
 }
 
 local s_custom_sources = {}
