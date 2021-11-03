@@ -256,10 +256,10 @@ function M.on_complete_done(bufnr)
     end
 
     local completion_sources = get_completion_sources(bufnr)
-    local cursorPosition = api.nvim_win_get_cursor(0)
+    local cursor_position = api.nvim_win_get_cursor(0)
     if
-        cursorPosition[1] == s_last_cursor_position[1]
-        and cursorPosition[2] == s_last_cursor_position[2]
+        cursor_position[1] == s_last_cursor_position[1]
+        and cursor_position[2] == s_last_cursor_position[2]
         and s_completion_index == #completion_sources + 1
     then
         api.nvim_feedkeys(api.nvim_replace_termcodes("<c-y>", true, false, true), "n", true)
