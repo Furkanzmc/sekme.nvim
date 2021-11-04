@@ -1,2 +1,2 @@
-imap <silent> <expr> <plug>(SekmeCompleteFwd) pumvisible() ? "\<C-n>" : sekme#completion_wrapper(v:false)
-imap <silent> <expr> <plug>(SekmeCompleteBack) pumvisible() ? "\<C-p>" : sekme#completion_wrapper(v:true)
+inoremap <silent> <expr> <plug>(SekmeCompleteFwd) sekme#completion_wrapper(v:false)
+inoremap <silent> <expr> <plug>(SekmeCompleteBack) sekme#completion_wrapper(v:true)

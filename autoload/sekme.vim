@@ -10,8 +10,7 @@ endfunction
 
 function sekme#completion_wrapper(backward) abort
     if pumvisible()
-        echoerr "Menu cannot be visible when you call this!"
-        return
+        return a:backward ? "\<C-p>" : "\<C-n>"
     endif
 
     let l:col = col('.') - 1
