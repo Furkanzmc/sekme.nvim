@@ -359,6 +359,10 @@ function M.setup(opts)
     cmd([[call sekme#setup_keymap()]])
 end
 
+function M.register_custom_source(source)
+    table.insert(s_custom_sources, source)
+end
+
 -- }}}
 
 return M
