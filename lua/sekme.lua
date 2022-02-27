@@ -178,8 +178,8 @@ end
 
 -- Completion Functions {{{
 
-local function complete_custom(_, base)
-    if base == "" then
+local function complete_custom(find_start, base)
+    if find_start == 1 and base == "" then
         local pos = api.nvim_win_get_cursor(0)
         local line = api.nvim_get_current_line()
         local line_to_cursor = line:sub(1, pos[2])
