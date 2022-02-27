@@ -189,7 +189,7 @@ local function complete_custom(find_start, base)
     local completions = {}
     local bufnr = api.nvim_get_current_buf()
     local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    local filetype = opt_local.filetype
+    local filetype = opt_local.filetype:get()
 
     for _, source in ipairs(s_custom_sources) do
         assert(source.complete, "complete() function is required.")
