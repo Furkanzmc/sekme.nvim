@@ -247,7 +247,7 @@ function M.on_complete_done_pre()
         return
     end
 
-    s_completion_timer = vim.loop.new_timer()
+    s_completion_timer = vim.uv.new_timer()
     local bufnr = api.nvim_get_current_buf()
     local timeout = 0
     if option_loaded then
@@ -288,7 +288,8 @@ function M.trigger_completion()
     s_last_cursor_position = api.nvim_win_get_cursor(0)
     s_completion_index = 1
     timer_handler()
-    s_completion_timer = vim.loop.new_timer()
+
+    s_completion_timer = vim.uv.new_timer()
     -- Run this first because otherwise the completion is not triggered when
     -- it is done the first time.
     s_completion_timer:start(
