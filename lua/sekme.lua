@@ -101,6 +101,8 @@ local s_buffer_completion_sources_cache = {}
 
 -- Local Functions {{{
 
+--- @param source table
+--- @param target table
 local function tbl_extend(source, target)
     for _, v in ipairs(target) do
         table.insert(source, v)
@@ -109,6 +111,8 @@ local function tbl_extend(source, target)
     return source
 end
 
+--- @param tab table
+--- @param val any
 local function tbl_index_of(tab, val)
     for index, value in ipairs(tab) do
         if value == val then
@@ -119,6 +123,7 @@ local function tbl_index_of(tab, val)
     return -1
 end
 
+--- @param bufnr integer
 local function get_completion_sources(bufnr)
     if s_buffer_completion_sources_cache[bufnr] ~= nil then
         return s_buffer_completion_sources_cache[bufnr]
@@ -178,6 +183,8 @@ end
 
 -- Completion Functions {{{
 
+--- @param find_start integer
+--- @param base string
 local function complete_custom(find_start, base)
     if find_start == 1 and base == "" then
         local pos = api.nvim_win_get_cursor(0)
@@ -207,6 +214,8 @@ end
 
 -- }}}
 
+--- @param find_start integer
+--- @param base string
 _G.trigger_sekme = function(find_start, base)
     return complete_custom(find_start, base)
 end
@@ -250,6 +259,7 @@ function M.on_complete_done_pre()
     s_completion_timer:start(timeout, 0, vim.schedule_wrap(timer_handler))
 end
 
+--- @param bufnr integer
 function M.on_complete_done(bufnr)
     if s_is_completion_dispatched == true then
         return
@@ -294,6 +304,7 @@ function M.trigger_completion()
     )
 end
 
+--- @param bufnr integer
 function M.setup_completion(bufnr)
     if vim.fn.exists("b:sekme_is_completion_configured") == 0 then
         api.nvim_buf_set_var(bufnr, "sekme_is_completion_configured", false)
@@ -332,6 +343,7 @@ function M.setup_completion(bufnr)
     api.nvim_buf_set_var(bufnr, "sekme_is_completion_configured", true)
 end
 
+--- @param opts table
 function M.setup(opts)
     cmd([[augroup sekme_completion]])
     cmd([[autocmd!]])
@@ -359,6 +371,7 @@ function M.setup(opts)
     cmd([[call sekme#setup_keymap()]])
 end
 
+--- @param source table
 function M.register_custom_source(source)
     table.insert(s_custom_sources, source)
 end
