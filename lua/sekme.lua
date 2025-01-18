@@ -144,7 +144,7 @@ local function timer_handler()
     end
 
     local bufnr = vim.fn.bufnr()
-    local filetype = api.nvim_buf_get_option(bufnr, "filetype")
+    local filetype = api.nvim_get_option_value("filetype", { buf = bufnr })
     local completion_sources = get_completion_sources(bufnr)
 
     if vim.fn.pumvisible() == 0 then
