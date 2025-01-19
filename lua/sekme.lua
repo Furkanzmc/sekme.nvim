@@ -168,11 +168,6 @@ local function timer_handler()
             end
 
             local mode_keys = api.nvim_replace_termcodes(source.keys, true, false, true)
-            api.nvim_feedkeys(
-                api.nvim_replace_termcodes("<c-g><c-g>", true, false, true),
-                "n",
-                true
-            )
             api.nvim_feedkeys(mode_keys, "n", true)
             s_is_completion_dispatched = true
             s_completion_index = s_completion_index + 1
@@ -244,7 +239,7 @@ function M.on_complete_done_pre(bufnr)
 
     local info = vim.fn.complete_info()
     if #info.items > 0 then
-        api.nvim_feedkeys(api.nvim_replace_termcodes("<c-y>", true, false, true), "n", true)
+        api.nvim_feedkeys(api.nvim_replace_termcodes("<c-e>", true, false, true), "n", true)
         s_completion_index = -1
         return
     end
@@ -282,9 +277,19 @@ function M.on_complete_done(bufnr)
         and cursor_position[2] == s_last_cursor_position[2]
         and s_completion_index == #completion_sources + 1
     then
-        api.nvim_feedkeys(api.nvim_replace_termcodes("<c-y>", true, false, true), "n", true)
+        api.nvim_feedkeys(api.nvim_replace_termcodes("<c-e>", true, false, true), "n", true)
         s_completion_index = -1
     end
+end
+
+function M.on_complete_changed(bufnr, event)
+    if event.size ~= nil then
+        return
+    end
+
+    M.on_complete_done_pre(bufnr)
+    M.on_complete_done(bufnr)
+    s_completion_index = -1
 end
 
 -- }}}
@@ -293,21 +298,6 @@ function M.trigger_completion()
     s_last_cursor_position = api.nvim_win_get_cursor(0)
     s_completion_index = 1
     timer_handler()
-
-    s_completion_timer = vim.uv.new_timer()
-    -- Run this first because otherwise the completion is not triggered when
-    -- it is done the first time.
-    s_completion_timer:start(
-        10,
-        0,
-        vim.schedule_wrap(function()
-            s_completion_timer:stop()
-            s_completion_timer:close()
-            s_completion_timer = nil
-
-            M.on_complete_done_pre()
-        end)
-    )
 end
 
 --- @param bufnr integer
@@ -341,6 +331,14 @@ function M.setup_completion(bufnr)
         group = group,
         callback = function(args)
             M.on_complete_done(args.buf)
+        end,
+    })
+
+    api.nvim_create_autocmd({ "CompleteChanged" }, {
+        pattern = "*",
+        group = group,
+        callback = function(args)
+            M.on_complete_changed(args.buf, vim.v.event)
         end,
     })
 
