@@ -8,41 +8,41 @@ local cmd = vim.cmd
 local option_loaded, options = pcall(require, "options")
 
 if option_loaded then
-    options.register_option({
+    options.register_option {
         name = "completion_timeout",
         default = 150,
         type_info = "number",
         source = "sekme",
         buffer_local = true,
         target_variable = "sekme_completion_timeout",
-    })
+    }
 
-    options.register_option({
+    options.register_option {
         name = "completion_key",
         default = "<Tab>",
         type_info = "string",
         source = "sekme",
         global = true,
         target_variable = "sekme_completion_key",
-    })
+    }
 
-    options.register_option({
+    options.register_option {
         name = "completion_rkey",
         default = "<S-Tab>",
         type_info = "string",
         source = "sekme",
         global = true,
         target_variable = "sekme_completion_rkey",
-    })
+    }
 
-    options.register_option({
+    options.register_option {
         name = "abbvr_trigger_char",
         default = "@",
         type_info = "string",
         source = "sekme",
         global = true,
         target_variable = "sekme_abbvr_trigger_char",
-    })
+    }
 end
 
 -- Variables {{{
@@ -93,7 +93,7 @@ local s_vim_sources = {
 }
 
 local s_custom_sources = {}
-local s_completion_index = nil
+local s_completion_index = -1
 local s_is_completion_dispatched = false
 local s_buffer_completion_sources_cache = {}
 
@@ -131,6 +131,12 @@ local function get_completion_sources(bufnr)
 
     s_buffer_completion_sources_cache[bufnr] = s_vim_sources
     return s_buffer_completion_sources_cache[bufnr]
+end
+
+--- @param opts table
+local function setup_keymap(opts)
+    vim.keymap.set("i", opts.completion_key, "<plug>(SekmeCompleteFwd)", { nowait = true })
+    vim.keymap.set("i", opts.completion_rkey, "<plug>(SekmeCompleteBack)", { nowait = true })
 end
 
 local function timer_handler()
@@ -346,10 +352,13 @@ end
 
 --- @param opts table
 function M.setup(opts)
-    cmd([[augroup sekme_completion]])
-    cmd([[autocmd!]])
-    cmd([[autocmd BufEnter * lua require'sekme'.setup_completion(vim.api.nvim_get_current_buf())]])
-    cmd([[augroup END]])
+    api.nvim_create_autocmd({ "BufEnter" }, {
+        pattern = "*",
+        group = api.nvim_create_augroup("sekme_completion", { clear = true }),
+        callback = function(_)
+            M.setup_completion(vim.api.nvim_get_current_buf())
+        end,
+    })
 
     if opts == nil then
         opts = {}
@@ -369,7 +378,7 @@ function M.setup(opts)
     vim.g.sekme_completion_rkey = opts.completion_rkey
     vim.g.sekme_abbvr_trigger_char = opts.abbvr_trigger_char
 
-    cmd([[call sekme#setup_keymap()]])
+    setup_keymap(opts)
 end
 
 --- @param source table
