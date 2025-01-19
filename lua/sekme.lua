@@ -4,7 +4,6 @@ local opt = vim.opt
 local opt_local = vim.opt_local
 local fn = vim.fn
 local api = vim.api
-local cmd = vim.cmd
 local option_loaded, options = pcall(require, "options")
 
 if option_loaded then
@@ -232,7 +231,8 @@ end
 
 -- Event Handlers {{{
 
-function M.on_complete_done_pre()
+--- @param bufnr integer
+function M.on_complete_done_pre(bufnr)
     if api.nvim_get_mode().mode == "n" then
         s_completion_index = -1
         return
@@ -254,7 +254,6 @@ function M.on_complete_done_pre()
     end
 
     s_completion_timer = vim.uv.new_timer()
-    local bufnr = api.nvim_get_current_buf()
     local timeout = 0
     if option_loaded then
         timeout = options.get_option_value("completion_timeout", bufnr)
@@ -328,24 +327,22 @@ function M.setup_completion(bufnr)
 
     vim.bo[bufnr].completefunc = "v:lua.trigger_sekme"
 
-    cmd("augroup sekme_completion_buf_" .. bufnr)
-    cmd([[au!]])
-    cmd(
-        "autocmd CompleteDonePre <buffer="
-            .. bufnr
-            .. ">"
-            .. " lua require'sekme'.on_complete_done_pre()"
-    )
+    local group = api.nvim_create_augroup("sekme_completion_buf_" .. bufnr, { clear = true })
+    api.nvim_create_autocmd({ "CompleteDonePre" }, {
+        pattern = "*",
+        group = group,
+        callback = function(args)
+            M.on_complete_done_pre(args.buf)
+        end,
+    })
 
-    cmd(
-        "autocmd CompleteDone <buffer="
-            .. bufnr
-            .. ">"
-            .. " lua require'sekme'.on_complete_done("
-            .. bufnr
-            .. ")"
-    )
-    cmd([[augroup END]])
+    api.nvim_create_autocmd({ "CompleteDone" }, {
+        pattern = "*",
+        group = group,
+        callback = function(args)
+            M.on_complete_done(args.buf)
+        end,
+    })
 
     api.nvim_buf_set_var(bufnr, "sekme_is_completion_configured", true)
 end
