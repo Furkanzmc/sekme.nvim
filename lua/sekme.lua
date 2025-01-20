@@ -138,7 +138,8 @@ local function setup_keymap(opts)
     vim.keymap.set("i", opts.completion_rkey, "<plug>(SekmeCompleteBack)", { nowait = true })
 end
 
-local function timer_handler()
+--- @param bufnr integer
+local function timer_handler(bufnr)
     if s_completion_index == -1 then
         return
     end
@@ -148,14 +149,13 @@ local function timer_handler()
         return
     end
 
-    local bufnr = vim.fn.bufnr()
-    local filetype = api.nvim_get_option_value("filetype", { buf = bufnr })
     local completion_sources = get_completion_sources(bufnr)
 
     if vim.fn.pumvisible() == 0 then
         if s_completion_index == #completion_sources + 1 then
             s_is_completion_dispatched = false
         else
+            local filetype = api.nvim_get_option_value("filetype", { buf = bufnr })
             local source = completion_sources[s_completion_index]
             if
                 (source.prediciate ~= nil and source.prediciate() == false)
@@ -163,7 +163,7 @@ local function timer_handler()
                 or (source.keys == nil or source.keys == "")
             then
                 s_completion_index = s_completion_index + 1
-                timer_handler()
+                timer_handler(bufnr)
                 return
             end
 
@@ -256,7 +256,13 @@ function M.on_complete_done_pre(bufnr)
         timeout = api.nvim_buf_get_var(bufnr, "sekme_completion_timeout")
     end
 
-    s_completion_timer:start(timeout, 0, vim.schedule_wrap(timer_handler))
+    s_completion_timer:start(
+        timeout,
+        0,
+        vim.schedule_wrap(function()
+            timer_handler(bufnr)
+        end)
+    )
 end
 
 --- @param bufnr integer
@@ -294,10 +300,11 @@ end
 
 -- }}}
 
-function M.trigger_completion()
+--- @param bufnr integer
+function M.trigger_completion(bufnr)
     s_last_cursor_position = api.nvim_win_get_cursor(0)
     s_completion_index = 1
-    timer_handler()
+    timer_handler(bufnr)
 end
 
 --- @param bufnr integer

@@ -29,6 +29,6 @@ function sekme#completion_wrapper(backward) abort
         endif
     endif
 
-    lua require'sekme'.trigger_completion()
+    lua require'sekme'.trigger_completion(vim.api.nvim_get_current_buf())
     return ''
 endfunction
