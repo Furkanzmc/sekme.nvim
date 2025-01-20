@@ -167,6 +167,11 @@ local function timer_handler(bufnr)
                 return
             end
 
+            api.nvim_feedkeys(
+                api.nvim_replace_termcodes("<c-g><c-g>", true, false, true),
+                "n",
+                true
+            )
             local mode_keys = api.nvim_replace_termcodes(source.keys, true, false, true)
             api.nvim_feedkeys(mode_keys, "n", true)
             s_is_completion_dispatched = true
