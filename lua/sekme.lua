@@ -172,10 +172,10 @@ local function timer_handler(bufnr)
                 "n",
                 true
             )
-            local mode_keys = api.nvim_replace_termcodes(source.keys, true, false, true)
-            api.nvim_feedkeys(mode_keys, "n", true)
             s_is_completion_dispatched = true
             s_completion_index = s_completion_index + 1
+            local mode_keys = api.nvim_replace_termcodes(source.keys, true, false, true)
+            api.nvim_feedkeys(mode_keys, "n", true)
         end
     end
 
