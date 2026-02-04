@@ -60,6 +60,8 @@ setup({opts})                                                      *options.set*
     Parameters: ~
         {opts} (optional, table)
             - {completion_key} (optional, string): Defaults to <Tab>
+            - {debug} (optional, string): Defaults to `false`. If set to `true`,
+              some diagnostics information will be printed.
             - {completion_rkey} (optional, string): Defaults to <R-Tab>. Used
               for reversing the completion order.
             - {abbvr_trigger_char} (optional, string): Defaults to `@`. If you
